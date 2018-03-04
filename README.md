@@ -11,6 +11,6 @@ To run lists on Linux/Unix system:
 4. `$ ./file_name.o`
 
 To run tests:
-1. Download the [<doctest>] repository (https://github.com/onqtam/doctest/blob/master/doc/markdown/tutorial.md)
+1. Download the [ <doctest> ] repository (https://github.com/onqtam/doctest/blob/master/doc/markdown/tutorial.md)
 2. `$ g++ file_name-tests.cpp -o file_name-tests.o`
 3. `$ ./file_name-tests.o`
