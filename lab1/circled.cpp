@@ -1,8 +1,4 @@
-#include <stdexcept>
-#include <string>
 #include "circled.h"
-
-using namespace std;
 
 list::list():
   first(nullptr),
@@ -20,7 +16,6 @@ list::~list() {
 }
 
 void list::push(string value) {
-  // push an element to the end of the list
   Node *element = new Node;
   element->data = value;
   if (length == 0) {
@@ -36,12 +31,10 @@ void list::push(string value) {
 }
 
 list list::select(int number) {
-  // create new list of elements on
-  // [number] position from current list
   list result;
   Node *current = first;
-  if (number > length || number == 0) {
-    throw invalid_argument("Impossible to select\n");
+  if (number > length || number == 0 || number < 0) {
+    throw out_of_range("Selection by zero or negative number\n");
   }
   for (int i = 1; i <= length; i++) {
     if(number > 0 && i % number == 0) result.push(current->data);
@@ -51,14 +44,17 @@ list list::select(int number) {
 }
 
 void list::insert(int index, string value) {
-  // insert an element after element[index]
   Node *current = first;
   for (int i = 0; i < index ; i++) {
     current = current->next;
   }
+  if (index < 0 || index >= length) {
+    throw out_of_range("Incorrect position for insertion");
+  }
   if (index == length - 1) {
     this->push(value);
-  } else {
+  }
+  if ((index >= 0) && (index < length - 1)) {
     Node *element = new Node;
     element->data = value;
     element->next = current->next;
@@ -69,8 +65,7 @@ void list::insert(int index, string value) {
   }
 }
 
-void list::del(int index, int count) {
-  // delete [count] of elements from element[index]
+void list::delete_count(int index, int count) {
   Node *current = first;
   if(length > 2) {
     for (int i = 0; i < index; i++) {
@@ -78,7 +73,7 @@ void list::del(int index, int count) {
     }
     current->prev->next = current->next;
     current->next->prev = current->prev;
-    if (index == 0 || index % (length - 1) == 0) {
+    if ((index == 0) || (index % (length - 1) == 0)) {
       first = current->next;
     }
   }
@@ -95,29 +90,19 @@ void list::del(int index, int count) {
   length--;
   count--;
   if (length == 0 && count != 0) {
-    throw invalid_argument("The list is empty");
+    throw logic_error("The list is empty");
   }
   if (length != 0 && count != 0) {
-    this->del(index, count);
+    this->delete_count(index, count);
   }
 }
 
 void list::move(int start, int steps) {
-  // move element[start] [steps] times
   Node *current = first;
   for (int i = 0; i < start; i++) {
     current = current->next;
-    cout << i << " - " << current->data;
   }
-  int index = (start + steps) % length;
-  this->insert(index - 1, current->data);
-  this->del(start + 1, 1);
-}
-
-list::Node *list::get_first() {
-  return this->first;
-}
-
-int list::size() {
-  return length;
+  int index = start + steps - 1;
+  this->insert(index, current->data);
+  this->delete_count(start, 1);
 }

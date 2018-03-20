@@ -21,7 +21,6 @@ Node* current = first;
 }
 
 void list::push(string value) {
-  // push an element to the end of the list
   Node *element = new Node;
   element->data = value;
   element->next = nullptr;
@@ -39,7 +38,6 @@ void list::push(string value) {
 }
 
 void list::insert(int index, string value) {
-  // insert an element after element[index]
   Node *current = first;
   if (index == length - 1) {
     this->push(value);
@@ -57,33 +55,50 @@ void list::insert(int index, string value) {
     length++;
   }
   if (index >= length || index < 0) {
-    throw invalid_argument("Invalid argument, impossible to insert");
+      throw out_of_range("Incorrect position for insertion");
   }
 }
 
-void list::del(int index, int count) {
-  // delete [count] of elements from element[index]
+void list::delete_count(int index, int count) {
+  if (count == 0) {
+    throw out_of_range("Senseless request: zero count");
+  }
   Node *current = first;
-  if (index < length && index >= 0) {
+  if (index < length && index > 0) {
     for (int i = 0; i < index; i++) {
       current = current->next;
     }
-    current->prev ? current->prev->next = current->next :
-                    first = current->next;
-    current->next ? current->next->prev = current->prev:
-                    last = current->prev;
+    if (length == 2) {
+      first->next = nullptr;
+      last = first;
+    }
+    if (current->next) {
+      current->next->prev = current->prev;
+      current->prev->next = current->next;
+    } else {
+      last = current->prev;
+      last->next = nullptr;
+    }
+  }
+  if (index == 0) {
+    if (current->next) {
+      first = current->next;
+    } else {
+      first = nullptr;
+      last = nullptr;
+    }
   }
   if (index >= length || index < 0) {
-    throw invalid_argument("Invalid argument, impossible to insert");
+    throw out_of_range("Incorrect index for deletition\n");
   }
   delete current;
   length--;
   count--;
   if (length == 0 && count != 0) {
-    throw invalid_argument("The list is empty");
+    throw logic_error("The list is empty");
   }
   if (count != 0 && length != 0) {
-    this->del(index, count);
+    this->delete_count(index, count);
   }
 }
 
@@ -92,36 +107,18 @@ void list::move(int start, int steps) {
   if (start < length && start > 0) {
     for (int i = 0; i < start; i++) {
       current = current->next;
-      cout << i << " - " << current->data;
     }
-    int index = start + steps;
-    this->insert(index, current->data);
-    this->del(start, 1);
   }
-  if (start >= length || start < 0) {
-    throw invalid_argument("Invalid argument, impossible to move");
-  }
-}
-
-list::Node* list::get_first() {
-  return first;
-}
-
-list::Node* list::get_last() {
-  return last;
-}
-
-int list::size() {
-  return length;
+  int index = start + steps - 1;
+  this->insert(index, current->data);
+  this->delete_count(start, 1);
 }
 
 list list::select(int number) {
-  // create new list of elements on
-  // [number] position from current list
   list result;
   Node *current = first;
-  if (number > length || number == 0) {
-    throw invalid_argument("Impossible to select\n");
+  if (number > length || number == 0 || number < 0) {
+    throw out_of_range("Selection by zero or negative number\n");
   }
   for (int i = 1; i <= length; i++) {
     if(number > 0 && i % number == 0) result.push(current->data);
